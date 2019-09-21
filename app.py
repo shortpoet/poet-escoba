@@ -8,16 +8,28 @@ from sqlalchemy import orm
 from sqlalchemy.engine import reflection
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from flask_cors import CORS, cross_origin
 
-connection_string = "root:password@localhost/test"
-engine = create_engine(f'mysql://{connection_string}')
-
-app = Flask(__name__)
+import random
+from collections import namedtuple
+from typing import List
+from itertools import combinations
+from functools import reduce
 
 from bson import json_util
 import json
 import re
 from datetime import datetime as dt
+
+
+connection_string = "root:password@localhost/test"
+engine = create_engine(f'mysql://{connection_string}')
+
+app = Flask(__name__)
+CORS(app, resources={r"/makedeck": {"origins": "http://localhost:8080"}})
+
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:password@localhost:3306/test"
 # db = SQLAlchemy(app)
@@ -37,35 +49,35 @@ metadata.reflect(engine)
 Base = declarative_base()
 Base.metadata = metadata
 
-db = create_engine('mysql://root:password@localhost:3306/test',echo=False)
-metadata.reflect(bind=db)
+# db = create_engine('mysql://root:password@localhost:3306/test',echo=False)
+# metadata.reflect(bind=db)
 
-deck_table = metadata.tables['Deck']
-cards_table = metadata.tables['Cards']
+# deck_table = metadata.tables['Deck']
+# cards_table = metadata.tables['Cards']
 
-sm = orm.sessionmaker(bind=db, autoflush=True, autocommit=True, expire_on_commit=True)
-session = orm.scoped_session(sm)
+# sm = orm.sessionmaker(bind=db, autoflush=True, autocommit=True, expire_on_commit=True)
+# session = orm.scoped_session(sm)
 
-q = session.query(deck_table,cards_table).join(cards_table)
-for r in q.limit(10):
-    print(r)\
+# q = session.query(deck_table,cards_table).join(cards_table)
+# for r in q.limit(10):
+#     print(r)\
 
-q = session.query(deck_table,cards_table).join(deck_table)
-for r in q.limit(10):
-    print(r)
+# q = session.query(deck_table,cards_table).join(deck_table)
+# for r in q.limit(10):
+#     print(r)
 
-class Card(Base):
-    __tablename__ = "Card"
-    deck = relationship("Deck", backref = "DeckId")
+# class Card(Base):
+#     __tablename__ = "Card"
+#     deck = relationship("Deck", backref = "DeckId")
 
 
-class Deck(Base):
-    __tablename__ = "Deck"
+# class Deck(Base):
+#     __tablename__ = "Deck"
 
-insp = reflection.Inspector.from_engine(db)
-print(insp.get_table_names())
-print(insp.get_foreign_keys(Cards.__tablename__))
-print(insp.get_foreign_keys(Deck.__tablename__))
+# insp = reflection.Inspector.from_engine(db)
+# print(insp.get_table_names())
+# print(insp.get_foreign_keys(Cards.__tablename__))
+# print(insp.get_foreign_keys(Deck.__tablename__))
 
 
 # Deck = Base.classes.Deck
@@ -107,6 +119,82 @@ def deck():
 
     return jsonify(columns)
     # return jsonify(all_passengers)
+
+@app.route("/makedeck")
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def makedeck():
+
+    Card = namedtuple("Card", ['suit', 'face', 'owner'])
+    faces = list(range(1,11))
+    suits = ['B', 'O', 'E', 'C']
+
+    def make_deck():
+        return {  str(n) + s: Card(suit=s, face=n, owner='') for n in faces for s in suits }
+
+    CardStore = make_deck()
+
+    def make_deck_from(card_ids :list):
+        return { card_id: CardStore[card_id] for card_id in card_ids }
+
+    def shuffle(deck :list):
+        random.shuffle(deck)
+        return deck
+
+    def get_escombinations(cards: set, pivot: str):
+        combos = set()
+        #combos.add(frozenset(cards | set([pivot])))
+        for i in range(len(cards)):
+            r = len(cards) + 1 - i # combinatorial order (from the 5 choose 'x' where 'x' is order)
+            combs = combinations(cards | set([pivot]),r)
+            for combo in  combs:
+                combo_vals = [CardStore[c].face for c in combo ]
+                if ( pivot in combo  # pivot card is the player's card - has to be part of combo
+                and sum(combo_vals) == 15 # only plays that add to 15 are considered, all other plays are equivalent to laying down card on table
+                or r > len(cards) ):
+                    combos.add(combo)
+        return combos
+
+    class Deck:
+        card_store = {}
+
+        deck_order = []
+        def __init__(self,card_store={}):
+            self.card_store = card_store
+            self.deck_order = list(card_store.keys())
+            random.shuffle(self.deck_order)
+            print("Hello deck {}".format(self.deck_order))
+        def shuffle(self):
+            return random.shuffle(self.deck_order)
+        def deal(self, n=1, owner=''):
+            d = self.deck_order[:n]
+            self.deck_order = self.deck_order[n:]
+            return set(d)
+            # def update_store(card,store, owner):
+            #   store.owner = owner
+            #   return store[card]
+            # return [update_store(delt,self.card_store, owner) for delt in d]
+        def cards(self):
+            return self.card_store
+        def order(self):
+            return self.deck_order
+
+    deck = Deck(CardStore)
+
+    cards = deck.cards()
+
+    order = deck.order()
+
+    items = {
+        "cards": cards,
+        "order": order
+    }
+
+    response = jsonify(items)
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port='5000', debug=True)
