@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/shortpoet/Repos/escoba/broom/broom.csproj": {}
+  },
+  "projects": {
+    "/home/shortpoet/Repos/escoba/broom/broom.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/shortpoet/Repos/escoba/broom/broom.csproj",
+        "projectName": "broom",
+        "projectPath": "/home/shortpoet/Repos/escoba/broom/broom.csproj",
+        "packagesPath": "/home/shortpoet/.nuget/packages/",
+        "outputPath": "/home/shortpoet/Repos/escoba/broom/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/home/shortpoet/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.2"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.2": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.2": {
+          "dependencies": {
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    }
+  }
+}
