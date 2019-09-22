@@ -25,7 +25,9 @@ export default {
   computed: {
     ...mapGetters([
       'getDeckLoaded',
-      'getDeck'
+      'getDeck',
+      'getCards',
+      'getDeckOrder'
     ])
   },
   methods: {
@@ -40,8 +42,9 @@ export default {
     }
   },
   mounted: function() {
-    this.log(this.getDeck)
+    this.log(this.getDeckOrder)
     if(this.getDeckLoaded) {
+      console.log(this.getCards)
       console.log(this.getDeck)
     }
   }
