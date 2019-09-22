@@ -30,7 +30,7 @@ Vue.config.productionTip = false
 store.dispatch('loadDeck').then(() => {
   router.beforeEach((to, from, next) => {
     next()
-  })  
+  })
 })
 
 new Vue({
