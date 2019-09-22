@@ -15,10 +15,13 @@ import 'vue-awesome/icons/trophy'
 import 'vue-awesome/icons/screwdriver'
 import 'vue-awesome/icons/hammer'
 import 'vue-awesome/icons/brands/bitcoin'
+import VueSwing from 'vue-swing'
 
 import Icon from 'vue-awesome/components/Icon'
 
 Vue.component('v-icon', Icon)
+
+Vue.component('vue-swing', VueSwing)
 
 Vue.use(BootstrapVue)
 
