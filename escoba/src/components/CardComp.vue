@@ -3,19 +3,31 @@
     <div v-if="getDeckLoaded">
       <b-container>
         <b-row>
-          <b-col md="2"></b-col>
+          <b-col md="2">
+            <h1>
+              {{ card.suit }}
+            </h1>
+          </b-col>
           <b-col md="8">
-            <b-card 
-              style="max-width: 20rem; height: 25rem"
+            <b-card
+              :class="'play-card-'+card.value" 
+              :id="'card-'+card.suit"
+              style="width: 20rem; height: 25rem"
             >
               <v-icon
                 v-for="(value, i) in card.value"
+                :id="'icon-'+(i+1)"
                 :key="i" 
                 :name="iconName"
+                scale=3.5
               ></v-icon>
             </b-card>
           </b-col>
-          <b-col md="2"></b-col>
+          <b-col md="2">
+            <h1>
+              {{ card.value }}
+            </h1>
+          </b-col>
         </b-row>
       </b-container>
     </div>
@@ -72,6 +84,121 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+
+/* set all cards to center of div and position: relative for absolute positioning of child icons */
+
+[class*=play-card-] {
+  transform: translate(500,0);
+  display: inline-block;
+  position: relative;
+}
+
+/* card value 1 */
+
+.play-card-1 #icon-1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+
+/* card value 2 */
+
+.play-card-2 #icon-1 {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+.play-card-2 #icon-2 {
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+
+/* card value 3 */
+
+.play-card-3 #icon-1 {
+  position: absolute;
+  top: 25%;
+  left: 75%;
+  transform: translate(-50%, -50%)
+}
+.play-card-3 #icon-2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+.play-card-3 #icon-3 {
+  position: absolute;
+  top: 75%;
+  left: 25%;
+  transform: translate(-50%, -50%)
+}
+
+/* card value 4 */
+
+.play-card-4 #icon-1 {
+  position: absolute;
+  top: 28%;
+  left: 28%;
+  transform: translate(-50%, -50%)
+}
+.play-card-4 #icon-2 {
+  position: absolute;
+  top: 28%;
+  left: 72%;
+  transform: translate(-50%, -50%)
+}
+.play-card-4 #icon-3 {
+  position: absolute;
+  top: 72%;
+  left: 28%;
+  transform: translate(-50%, -50%)
+}
+.play-card-4 #icon-4 {
+  position: absolute;
+  top: 72%;
+  left: 72%;
+  transform: translate(-50%, -50%)
+}
+
+/* card value 5 */
+
+.play-card-5 #icon-1 {
+  position: absolute;
+  top: 20%;
+  left: 28%;
+  transform: translate(-50%, -50%)
+}
+.play-card-5 #icon-2 {
+  position: absolute;
+  top: 20%;
+  left: 72%;
+  transform: translate(-50%, -50%)
+}
+.play-card-5 #icon-3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+.play-card-5 #icon-4 {
+  position: absolute;
+  top: 80%;
+  left: 28%;
+  transform: translate(-50%, -50%)
+}
+.play-card-5 #icon-5 {
+  position: absolute;
+  top: 80%;
+  left: 72%;
+  transform: translate(-50%, -50%)
+}
+
 h3 {
   margin: 40px 0 0;
 }
