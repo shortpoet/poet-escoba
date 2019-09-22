@@ -11,6 +11,14 @@ import VueAxios from 'vue-axios'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'vue-awesome/icons/trophy'
+import 'vue-awesome/icons/screwdriver'
+import 'vue-awesome/icons/hammer'
+import 'vue-awesome/icons/brands/bitcoin'
+
+import Icon from 'vue-awesome/components/Icon'
+
+Vue.component('v-icon', Icon)
 
 Vue.use(BootstrapVue)
 

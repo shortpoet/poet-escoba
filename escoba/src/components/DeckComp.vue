@@ -1,7 +1,11 @@
 <template>
   <div class="deck-comp">
     <div v-if="getDeckLoaded">
-      <CardComp />
+      <CardComp
+        v-for="(card, i) in getDeck"
+        :key="i"
+        :card="card"
+      />
     </div>
   </div>
 </template>

@@ -17,6 +17,7 @@
     "register-service-worker": "^1.6.2",
     "svg-cards": "^4.0.0",
     "vue": "^2.6.10",
+    "vue-awesome": "^3.5.4",
     "vue-axios": "^2.1.4",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1"
