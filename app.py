@@ -35,6 +35,18 @@ metadata = MetaData()
 Base = declarative_base()
 Base.metadata = metadata
 
+class LogItem(Base):
+    __tablename__ = 'log'
+    LogId = Column(Integer, primary_key=True)
+    LogTime = Column(TIMESTAMP, default=dt.utcnow())
+    LogType = Column(String(32))
+    LogBlob = Column(String)
+    # def __init__(self):
+    #     self.LogTime = dt.utcnow()
+    #     self.LogType = self.LogType
+    def __repr__(self):
+        return f"<LogItem(LogTime={self.LogTime}, LogType={self.LogType}, LogBlob={self.LogBlob})>"
+
 db = create_engine('mysql://root:password@localhost/test',echo=False)
 metadata.reflect(bind=db)
 
@@ -109,12 +121,17 @@ def makedeck():
 
     if request.method == "POST":
         context = request.get_json(force=True)
-        print(context)
-        if session.query(log_table).filter(log_table.LogId==1).count()==0:
-            print("Creating new product:")
-            session.flush()
-        else:
-            print(f"product with id 1 already exists: {session.query(LogItem).filter(LogItem.logid==1).one()}")
+        id_query = session.query(LogItem.LogId).all()
+        ids = []
+        for logid in id_query:
+            ids.append(logid)
+        last_id = ids[-1][0]
+        if context['isDeck'] == True:
+            log_item = LogItem(LogTime=dt.utcnow(), LogType='Deck', LogBlob=context)
+            session.add(log_item)
+            print("#### checking update ####")
+            for item in session.query(LogItem).filter(LogItem.LogId==last_id):
+                print(f"Last Added LogId: {item.LogId}")
 
         return response
     else:

@@ -61,9 +61,12 @@ Base.metadata = metadata
 class LogItem(Base):
     __tablename__ = 'log'
     LogId = Column(Integer, primary_key=True)
-    LogTime = Column(TIMESTAMP, default=dt.utcnow)
+    LogTime = Column(TIMESTAMP, default=dt.utcnow())
     LogType = Column(String(32))
-    LogBlob = Column(LargeBinary)
+    LogBlob = Column(String)
+    # def __init__(self):
+    #     self.LogTime = dt.utcnow()
+    #     self.LogType = self.LogType
     def __repr__(self):
         return f"<LogItem(LogTime={self.LogTime}, LogType={self.LogType}, LogBlob={self.LogBlob})>"
 
@@ -228,16 +231,31 @@ def makedeck():
 
     if request.method == "POST":
         context = request.get_json(force=True)
-        print(context)
-        if session.query(LogItem).filter(LogItem.LogId==1).count()==0:
+        id_query = session.query(LogItem.LogId).all()
+        ids = []
+        for logid in id_query:
+            ids.append(logid)
+        last_id = ids[-1][0]
+        print(int(last_id))
+        if context['isDeck'] == True:
+            log_item = LogItem(LogTime=dt.utcnow(), LogType='Deck', LogBlob=context)
+            print(context['deck'][0])
+            print(log_item)
+            print(dt.utcnow())
+            session.add(log_item)
+            print("#### checking update ####")
+            for item in session.query(LogItem).filter(LogItem.LogId==last_id):
+                print(item)
+
+        # if session.query(LogItem).filter(LogItem.LogId==1).count()==0:
             
 
-            # new_log = LogItem("1","Product1")
-            print("Creating new product:")
-            # session.add(new_prod)
-            session.flush()
-        else:
-            print(f"product with id 1 already exists: {session.query(LogItem).filter(LogItem.logid==1).one()}")
+        #     # new_log = LogItem("1","Product1")
+        #     print("Creating new product:")
+        #     # session.add(new_prod)
+        #     session.flush()
+        # else:
+        #     print(f"product with id 1 already exists: {session.query(LogItem).filter(LogItem.logid==1).one()}")
 
         # print "loading Product with id=1"
         # prod = session.query(Product).filter(Product.id==1).one()

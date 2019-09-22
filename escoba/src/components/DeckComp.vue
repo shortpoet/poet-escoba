@@ -21,11 +21,6 @@ import { mapGetters } from 'vuex'
 import CardComp from '@/components/CardComp'
 import axios from 'axios'
 
-var config = { headers: {  
-                      'Content-Type': 'application/json',
-                      'Access-Control-Allow-Origin': '*'}
-             }
-
 export default {
   name: 'DeckComp',
   components: {
@@ -53,9 +48,18 @@ export default {
       }
     },
     post: function () {
+      var config = { 
+        headers: {  
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+          }
+      }
+      var payload = {
+        deck: this.getDeck,
+        isDeck: true
+      }
       axios
-        .post("http://127.0.0.1:5000/makedeck", 
-          { label : "Test" , text : "Test"} , config)
+        .post("http://127.0.0.1:5000/makedeck", payload , config)
         .then(function (response) {
           console.log(response);
         })
