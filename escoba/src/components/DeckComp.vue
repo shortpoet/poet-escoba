@@ -4,7 +4,7 @@
       <b-button
         @click="post()"
       >
-        Post
+        Get New Deck
       </b-button>
       <hr />
       <CardComp
