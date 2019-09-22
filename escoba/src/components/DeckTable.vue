@@ -1,8 +1,8 @@
 <template>
   <div class="deck-table">
     <div v-if="getDeckLoaded">
-      <b-table responsive striped hover :items="this.getCards"></b-table>
-      {{ this.getCards }}
+      <b-table responsive striped hover :items="this.getDeck"></b-table>
+      {{ this.getDeck }}
     </div>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
   computed: {
     ...mapGetters([
       'getDeckLoaded',
-      'getCards'
+      'getDeck'
     ])
   },
   methods: {

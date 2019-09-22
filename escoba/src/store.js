@@ -16,19 +16,24 @@ export default new Vuex.Store({
       var cards = []
       // console.log(Object.entries(state.deckData.cards))
       Object.entries(state.deckData.cards).forEach((v, i, a) => {
-        console.log(v[1])
-        v[1].forEach((vv, ii, aa) => {
-          console.log(vv)
-          cards.push({'suit': vv[0], 'value': vv[1]})
-        }
-      )
+        cards.push(v[0])
     })
     return cards
-  },
-  getDeckLoaded: (state) => {
-    console.log(state.deckLoaded)
-    return state.deckLoaded
-  }
+    },
+    getDeck: function(state) {
+      var deck = []
+      // console.log(Object.entries(state.deckData.cards))
+      Object.entries(state.deckData.cards).forEach((v, i, a) => {
+        var [a,b,c] = v[1]
+        deck.push({'suit': a, 'value': b, 'owner': c})
+    })
+    console.log(deck)
+    return deck
+    },
+    getDeckLoaded: (state) => {
+      console.log(state.deckLoaded)
+      return state.deckLoaded
+    }
   },
   mutations: {
     changeDeckErrored: function(state, errored) {
