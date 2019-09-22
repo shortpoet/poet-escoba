@@ -1,17 +1,20 @@
 <template>
-  <div class="deck-table">
+  <div class="deck-comp">
     <div v-if="getDeckLoaded">
-      <b-table responsive striped hover :items="this.getDeck"></b-table>
-      {{ this.getDeck }}
+      <CardComp />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import CardComp from '@/components/CardComp'
 
 export default {
-  name: 'DeckTable',
+  name: 'DeckComp',
+  components: {
+    CardComp  
+  },
   props: {
     msg: String
   },
@@ -33,9 +36,9 @@ export default {
     }
   },
   mounted: function() {
-    //this.log(this.getDeck)
+    this.log(this.getDeck)
     if(this.getDeckLoaded) {
-      //console.log(this.getDeck)
+      console.log(this.getDeck)
     }
   }
 }

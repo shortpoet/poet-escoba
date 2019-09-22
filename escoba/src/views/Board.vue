@@ -1,25 +1,20 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/Broom_.svg">
+  <div class="board">
     <div v-if="getDeckLoaded">
-      <DeckTable />
+        <DeckComp />
     </div>
-    <GamesList msg="Welcome to GamesList"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import GamesList from '@/components/GamesList.vue'
-import DeckTable from '@/components/DeckTable.vue'
-import axios from 'axios'
+import DeckComp from '@/components/DeckComp.vue'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Home',
+  name: 'Board',
   components: {
-    GamesList,
-    DeckTable
+    DeckComp
   },
   computed: {
     ...mapGetters([
