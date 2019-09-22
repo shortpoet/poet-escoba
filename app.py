@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, Markup, url_for, jsonify
+from flask import Flask, render_template, redirect, Markup, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -7,7 +7,7 @@ from sqlalchemy import *
 from sqlalchemy import orm
 from sqlalchemy.engine import reflection
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, mapper
 from flask_cors import CORS, cross_origin
 
 import random
@@ -30,97 +30,26 @@ CORS(app, resources={r"/makedeck": {"origins": "http://localhost:8080"}})
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:password@localhost:3306/test"
-# db = SQLAlchemy(app)
-
-# Base = automap_base()
-# reflect the tables
-# Base.prepare(engine, reflect=True)
-
-# Create our session (link) from Python to the DB
-session = Session(engine)
 metadata = MetaData()
-metadata.reflect(engine)
-
-# Base = automap_base(metadata=metadata)
-# Base.prepare()
 
 Base = declarative_base()
 Base.metadata = metadata
 
-# db = create_engine('mysql://root:password@localhost:3306/test',echo=False)
-# metadata.reflect(bind=db)
+db = create_engine('mysql://root:password@localhost/test',echo=False)
+metadata.reflect(bind=db)
 
-# deck_table = metadata.tables['Deck']
-# cards_table = metadata.tables['Cards']
+log_table = metadata.tables['log']
 
-# sm = orm.sessionmaker(bind=db, autoflush=True, autocommit=True, expire_on_commit=True)
-# session = orm.scoped_session(sm)
-
-# q = session.query(deck_table,cards_table).join(cards_table)
-# for r in q.limit(10):
-#     print(r)\
-
-# q = session.query(deck_table,cards_table).join(deck_table)
-# for r in q.limit(10):
-#     print(r)
-
-# class Card(Base):
-#     __tablename__ = "Card"
-#     deck = relationship("Deck", backref = "DeckId")
-
-
-# class Deck(Base):
-#     __tablename__ = "Deck"
-
-# insp = reflection.Inspector.from_engine(db)
-# print(insp.get_table_names())
-# print(insp.get_foreign_keys(Cards.__tablename__))
-# print(insp.get_foreign_keys(Deck.__tablename__))
-
-
-# Deck = Base.classes.Deck
-# print(Base.classes)
-
-
-# class User(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     username = db.Column(db.String, unique=True, nullable=False)
-#     email = db.Column(db.String, unique=True, nullable=False)
+sm = orm.sessionmaker(bind=db, autoflush=True, autocommit=True, expire_on_commit=True)
+session = orm.scoped_session(sm)
 
 @app.route("/tablenames")
 def tablenames():
 
     table_names = engine.table_names()
-
-    # db.session.add(User(name="Flask", email="example@example.com"))
-    # db.session.commit()
-
-    # users = User.query.all()
-
     return jsonify(table_names)
 
-@app.route("/deck")
-def deck():
-
-    deck = session.query(Deck).all()
-    # columns = session.query(Deck.__table__.columns).all()
-    # col_arr = [col for col in columns]
-    columns = Deck.__table__.columns.keys()
-    cards = []
-    for card in deck:
-        passenger_dict = {}
-        # passenger_dict["name"] = passenger.name
-        # passenger_dict["age"] = passenger.age
-        # passenger_dict["sex"] = passenger.sex
-        cards.append(card)
-        print(card)
-
-    return jsonify(columns)
-    # return jsonify(all_passengers)
-
-@app.route("/makedeck")
+@app.route("/makedeck", methods=["GET", "POST"])
 @cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
 def makedeck():
 
@@ -139,20 +68,6 @@ def makedeck():
     def shuffle(deck :list):
         random.shuffle(deck)
         return deck
-
-    def get_escombinations(cards: set, pivot: str):
-        combos = set()
-        #combos.add(frozenset(cards | set([pivot])))
-        for i in range(len(cards)):
-            r = len(cards) + 1 - i # combinatorial order (from the 5 choose 'x' where 'x' is order)
-            combs = combinations(cards | set([pivot]),r)
-            for combo in  combs:
-                combo_vals = [CardStore[c].face for c in combo ]
-                if ( pivot in combo  # pivot card is the player's card - has to be part of combo
-                and sum(combo_vals) == 15 # only plays that add to 15 are considered, all other plays are equivalent to laying down card on table
-                or r > len(cards) ):
-                    combos.add(combo)
-        return combos
 
     class Deck:
         card_store = {}
@@ -191,10 +106,19 @@ def makedeck():
 
     response = jsonify(items)
     # response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
 
+    if request.method == "POST":
+        context = request.get_json(force=True)
+        print(context)
+        if session.query(log_table).filter(log_table.LogId==1).count()==0:
+            print("Creating new product:")
+            session.flush()
+        else:
+            print(f"product with id 1 already exists: {session.query(LogItem).filter(LogItem.logid==1).one()}")
 
-
+        return response
+    else:
+        return response
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port='5000', debug=True)

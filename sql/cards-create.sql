@@ -20,4 +20,4 @@ INSERT INTO `test`.`Deck`
 VALUES
 ('Classic');
 
-select * from Deck;
+select * from Cards;

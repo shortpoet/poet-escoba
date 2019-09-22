@@ -1,6 +1,12 @@
 <template>
   <div class="deck-comp">
     <div v-if="getDeckLoaded">
+      <b-button
+        @click="post()"
+      >
+        Post
+      </b-button>
+      <hr />
       <CardComp
         v-for="(card, i) in getDeck"
         :key="i"
@@ -13,6 +19,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import CardComp from '@/components/CardComp'
+import axios from 'axios'
+
+var config = { headers: {  
+                      'Content-Type': 'application/json',
+                      'Access-Control-Allow-Origin': '*'}
+             }
 
 export default {
   name: 'DeckComp',
@@ -39,6 +51,17 @@ export default {
       else {
         console.log(comp)
       }
+    },
+    post: function () {
+      axios
+        .post("http://127.0.0.1:5000/makedeck", 
+          { label : "Test" , text : "Test"} , config)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
   },
   mounted: function() {
