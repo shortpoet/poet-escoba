@@ -4,6 +4,16 @@ from collections import namedtuple
 from typing import List
 from itertools import combinations
 from functools import reduce
+import threading
+import time
+import simple_app
+from .simple_app import playround
+
+thread = threading.Thread(target=simple_app.playround)
+thread.start()
+result_available = threading.Event()
+result = None
+
 Card = namedtuple("Card", ['suit', 'face', 'owner'])
 faces = list(range(1,11))
 suits = ['B', 'O', 'E', 'C']
@@ -108,10 +118,12 @@ class Game:
   def deal_hand(self):
     p1 = set()
     p2 = set()
+    print(len(self.deck.order()))
     # deal out to p1 and p2 alternating 3 each
     for count in range(0,3):
       [ p1.add(d) for d in self.deck.deal()]
       [ p2.add(d) for d in self.deck.deal()]
+    print(len(self.deck.order())) 
     return p1,p2
 
   def deal_start(self):
@@ -232,7 +244,10 @@ class Game:
           playable = self.valid_plays(second_player,self.table_cards)
           play = second_player.get_play(playable)
           if self.apply_play(play,second_player): last_scored = second_player.name
-
+        while not result_available.wait(timeout=120):
+          print('waiting for user input')
+        print(result)
+        print(play)
     # award last_player_to_score remaining cards
     [self.set_card_owner(card_id, last_scored) for card_id, card in self.deck.cards().items() if card.owner == '']
     self.apply_score()

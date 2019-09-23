@@ -276,5 +276,48 @@ def makedeck():
     else:
         return response
 
+@app.route("/dealhand", methods=["GET", "POST"])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def dealhand():
+
+  def deal_hand(deck):
+    p1 = set()
+    p2 = set()
+    # deal out to p1 and p2 alternating 3 each
+    for count in range(0,3):
+      [ p1.add(d) for d in deck.deal()]
+      [ p2.add(d) for d in deck.deal()]
+    return p1,p2
+
+  def deal_start(self):
+    p1,p2 = self.deal_hand()
+    start_table_cards = self.deck.deal(4)
+    return p1,p2,start_table_cards
+
+    items = {
+    }
+
+    response = jsonify(items)
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+
+    if request.method == "POST":
+        context = request.get_json(force=True)
+        id_query = session.query(LogItem.LogId).all()
+        # ids = []
+        # for logid in id_query:
+        #     ids.append(logid)
+        # last_id = ids[-1][0]
+        # if context['isDeck'] == True:
+        #     log_item = LogItem(LogTime=dt.utcnow(), LogType='Deck', LogBlob=context)
+        #     # session.add(log_item)
+        #     print("#### checking update ####")
+        #     for item in session.query(LogItem).filter(LogItem.LogId==last_id):
+        #         print(f"Last Added LogId: {item.LogId}")
+
+        return response
+    else:
+        return response
+
+
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port='5000', debug=True)

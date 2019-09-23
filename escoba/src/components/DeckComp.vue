@@ -2,9 +2,21 @@
   <div class="deck-comp">
     <div v-if="getDeckLoaded">
       <b-button
-        @click="post()"
+        @click="makeDeck()"
       >
         Get New Deck
+      </b-button>
+        |
+      <b-button
+        @click="dealHand()"
+      >
+        Deal Hand
+      </b-button>
+        |
+      <b-button
+        @click="playRound()"
+      >
+        Play Round
       </b-button>
       <hr />
       <CardComp
@@ -47,26 +59,43 @@ export default {
         console.log(comp)
       }
     },
-    post: function () {
+    post: function (url, payload) {
       var config = { 
         headers: {  
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
           }
       }
-      var payload = {
-        deck: this.getDeck,
-        isDeck: true
-      }
       axios
-        .post("http://127.0.0.1:5000/makedeck", payload , config)
+        .post(url, payload , config)
         .then(function (response) {
           console.log(response);
         })
         .catch(function (error) {
           console.log(error);
         });
-    }
+    },
+    makeDeck: function () {
+      var payload = {
+        deck: this.getDeck,
+        isDeck: true
+      }
+      this.post("http://127.0.0.1:5000/makedeck", payload)
+    },
+    dealHand: function () {
+      var payload = {
+        deck: this.getDeck,
+        isDeck: true
+      }
+      this.post("http://127.0.0.1:5000/dealhand", payload)
+    },
+    playRound: function () {
+      var payload = {
+        deck: this.getDeck,
+        isDeck: true
+      }
+      this.post("http://127.0.0.1:5000/playround", payload)
+    },
   },
   mounted: function() {
     this.log(this.getDeckOrder)
