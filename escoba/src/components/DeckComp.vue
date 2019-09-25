@@ -24,6 +24,12 @@
       >
         Unpause
       </b-button>
+      |
+      <b-button
+        @click="pause()"
+      >
+        Pause
+      </b-button>
       <hr />
       <CardComp
         v-for="(card, i) in getDeck"
@@ -105,6 +111,12 @@ export default {
     unpause: function () {
       var payload = {
         paused: false
+      }
+      this.post("http://127.0.0.1:5000/unpause", payload)
+    },
+    pause: function () {
+      var payload = {
+        paused: true
       }
       this.post("http://127.0.0.1:5000/unpause", payload)
     },

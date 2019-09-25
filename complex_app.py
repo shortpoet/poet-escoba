@@ -132,7 +132,8 @@ class Game:
     print("Start game")
     #return NotImplemented
 
-  def set_pause_state(switch):
+  def set_pause_state(self, switch):
+    print(f"#### switching paused to:{switch} ####")
     self.paused = switch
 
   def get_pause_state():
@@ -413,10 +414,10 @@ def unpause():
     if request.method == "POST":
 
         context = request.get_json(force=True)
-        if context['paused'] == True:
-          paused = True
-          print(f"paused_state: {paused}")
-          g.set_pause_state(paused)
+        print(context['paused'])
+        paused = context['paused']
+        print(f"paused_state: {paused}")
+        g.set_pause_state(paused)
 
         return response
     else:
