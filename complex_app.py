@@ -280,6 +280,7 @@ class Game:
           if self.apply_play(play,second_player): last_scored = second_player.name
         while (self.paused):
           get_play(play)
+          
     # award last_player_to_score remaining cards
     [self.set_card_owner(card_id, last_scored) for card_id, card in self.deck.cards().items() if card.owner == '']
     self.apply_score()
@@ -333,7 +334,8 @@ def makedeck():
         "cards": g.deck.cards(),
         "order": g.deck.order()
     }
-
+    print('#### deck order ####')
+    print(g.deck.order())
     response = jsonify(game_items)
     # response.headers.add('Access-Control-Allow-Origin', '*')
 
@@ -341,19 +343,19 @@ def makedeck():
         context = request.get_json(force=True)
         if context['isDeck'] == True:
             log_item = LogItem(LogTime=dt.utcnow(), LogType='Deck', LogBlob=context)
-            print(context['deck'][0])
-            print(log_item)
-            print(dt.utcnow())
+            # print(context['deck'][0])
+            # print(log_item)
+            # print(dt.utcnow())
             session.add(log_item)
-            print("#### checking update ####")
+            # print("#### checking update ####")
         id_query = session.query(LogItem.LogId).all()
         ids = []
         for logid in id_query:
           ids.append(logid)
         last_id = ids[-1][0]
-        print(int(last_id))
-        for item in session.query(LogItem).filter(LogItem.LogId==last_id):
-          print(item)
+        # print(int(last_id))
+        # for item in session.query(LogItem).filter(LogItem.LogId==last_id):
+          # print(item)
 
         return response
     else:
@@ -422,6 +424,29 @@ def unpause():
         return response
     else:
         return response
+
+@app.route("/getvalidplays", methods=["GET", "POST"])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def getvalidplay():
+
+
+    
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+
+    if request.method == "POST":
+
+        context = request.get_json(force=True)
+
+        return response
+    else:
+      context = request.get_json(force=True)
+      
+      valid_plays = {
+        "player_1": g.valid_plays(g.p1, g.table_cards),
+        "player_2": g.valid_plays(g.p2, g.table_cards),
+      }
+      response = jsonify(valid_plays)
+      return response
 
 with app.app_context():
     print(current_app)

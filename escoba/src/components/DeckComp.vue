@@ -120,6 +120,12 @@ export default {
       }
       this.post("http://127.0.0.1:5000/unpause", payload)
     },
+    getValidPlays: function () {
+      var payload = {
+        paused: true
+      }
+      this.get("http://127.0.0.1:5000/getvalidplays", payload)
+    },
   },
   mounted: function() {
     this.log(this.getDeckOrder)

@@ -4,7 +4,6 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 
-
 export default new Vuex.Store({
   state: {
     deckLoaded: false,
@@ -12,7 +11,7 @@ export default new Vuex.Store({
     deckData: []
   },
   getters: {
-    getCards: function(state) {
+    getCards: function (state) {
       var cards = []
       // console.log(Object.entries(state.deckData.cards))
       Object.entries(state.deckData.cards).forEach((v, i, a) => {
@@ -20,17 +19,21 @@ export default new Vuex.Store({
       })
       return cards
     },
-    getDeck: function(state, getters) {
+    getDeck: function (state, getters) {
       var deck = []
+      console.log(state.deckData)
       // console.log(Object.entries(state.deckData.cards))
-      Object.entries(state.deckData.cards).forEach((v, i, a) => {
-        var [a,b,c] = v[1]
-        var d =  b.toString() + a
-        deck.push({'suit': a, 'value': b, 'owner': c, 'card': d})
+      Object.entries(state.deckData.cards).forEach((value, index, array) => {
+        var [a, b, c] = value[1]
+        var d = b.toString() + a
+        deck.push({ 'suit': a, 'value': b, 'owner': c, 'card': d })
       })
-      deck.sort(function (a , b) {
+      console.log(deck)
+      console.log(getters.getDeckOrder)
+      deck.sort(function (a, b) {
         return getters.getDeckOrder.indexOf(a.card) - getters.getDeckOrder.indexOf(b.card)
       })
+      console.log(deck)
       return deck
     },
     getDeckLoaded: (state) => {
@@ -41,28 +44,28 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    changeDeckErrored: function(state, errored) {
+    changeDeckErrored: function (state, errored) {
       state.deckErrored = errored
     },
-    changeDeckLoaded: function(state, loaded) {
+    changeDeckLoaded: function (state, loaded) {
       state.deckLoaded = loaded
     },
     initData: function (state, data) {
       state.deckData = data
-    },
+    }
   },
   actions: {
     loadDeck: function ({ commit, state }) {
       axios.get('http://127.0.0.1:5000/makedeck')
-        .then(function(response) {
+        .then(function (response) {
           console.log(response)
           commit('initData', response.data)
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error)
           commit('changeDeckErrored', true)
         })
-        .finally(function() {
+        .finally(function () {
           console.log('#### deck finally ####')
           commit('changeDeckLoaded', true)
         })
