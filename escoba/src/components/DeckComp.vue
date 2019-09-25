@@ -1,6 +1,15 @@
 <template>
   <div class="deck-comp">
+    <div v-if="getValidPlaysLoaded">
+      {{ getValidPlays }}
+    </div>
     <div v-if="getDeckLoaded">
+      <b-button
+        @click="loadValidPlays()"
+      >
+        Get Valid Plays
+      </b-button>
+        |
       <b-button
         @click="makeDeck()"
       >
@@ -58,7 +67,9 @@ export default {
       'getDeckLoaded',
       'getDeck',
       'getCards',
-      'getDeckOrder'
+      'getDeckOrder',
+      'getValidPlaysLoaded',
+      'getValidPlays'
     ])
   },
   methods: {
@@ -120,12 +131,14 @@ export default {
       }
       this.post("http://127.0.0.1:5000/unpause", payload)
     },
-    getValidPlays: function () {
+    loadValidPlays: function () {
       var payload = {
-        paused: true
+        deck: this.getDeckOrder,
+        isDeck: true
       }
-      this.get("http://127.0.0.1:5000/getvalidplays", payload)
-    },
+      this.post("http://127.0.0.1:5000/validplays", payload)
+      this.$store.dispatch('loadValidPlays')
+    }
   },
   mounted: function() {
     this.log(this.getDeckOrder)

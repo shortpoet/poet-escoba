@@ -8,7 +8,10 @@ export default new Vuex.Store({
   state: {
     deckLoaded: false,
     deckErrored: false,
-    deckData: []
+    deckData: [],
+    validPlaysLoaded: false,
+    validPlaysErrored: false,
+    validPlays: []
   },
   getters: {
     getCards: function (state) {
@@ -41,6 +44,12 @@ export default new Vuex.Store({
     },
     getDeckOrder: (state) => {
       return state.deckData.order
+    },
+    getValidPlaysLoaded: (state) => {
+      return state.validPlaysLoaded
+    },
+    getValidPlays: (state) => {
+      return state.validPlays
     }
   },
   mutations: {
@@ -52,6 +61,15 @@ export default new Vuex.Store({
     },
     initData: function (state, data) {
       state.deckData = data
+    },
+    changeValidPlaysErrored: function (state, errored) {
+      state.validPlaysErrored = errored
+    },
+    changeValidPlaysLoaded: function (state, loaded) {
+      state.validPlaysLoaded = loaded
+    },
+    changeValidPlays: function (state, data) {
+      state.validPlays = data
     }
   },
   actions: {
@@ -68,6 +86,21 @@ export default new Vuex.Store({
         .finally(function () {
           console.log('#### deck finally ####')
           commit('changeDeckLoaded', true)
+        })
+    },
+    loadValidPlays: function ({ commit, state }) {
+      axios.get('http://127.0.0.1:5000/validplays')
+        .then(function (response) {
+          console.log(response)
+          commit('changeValidPlays', response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+          commit('changeValidPlaysErrored', true)
+        })
+        .finally(function () {
+          console.log('#### deck finally ####')
+          commit('changeValidPlaysLoaded', true)
         })
     }
   }

@@ -24,6 +24,8 @@ import json
 import re
 from datetime import datetime as dt
 
+from pprint import pprint
+
 connection_string = "root:password@localhost/test"
 engine = create_engine(f'mysql://{connection_string}')
 
@@ -135,6 +137,9 @@ class Game:
   def set_pause_state(self, switch):
     print(f"#### switching paused to:{switch} ####")
     self.paused = switch
+
+  def get_table_cards():
+    return self.table_cards
 
   def get_pause_state():
     return self.paused
@@ -425,28 +430,35 @@ def unpause():
     else:
         return response
 
-@app.route("/getvalidplays", methods=["GET", "POST"])
+@app.route("/validplays", methods=["GET", "POST"])
 @cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
-def getvalidplay():
+def validplays():
 
+    items = {
+    }
+    response = jsonify(items)
 
+    deck = []
     
-    # response.headers.add('Access-Control-Allow-Origin', '*')
-
     if request.method == "POST":
-
-        context = request.get_json(force=True)
-
-        return response
-    else:
       context = request.get_json(force=True)
-      
-      valid_plays = {
-        "player_1": g.valid_plays(g.p1, g.table_cards),
-        "player_2": g.valid_plays(g.p2, g.table_cards),
-      }
-      response = jsonify(valid_plays)
+      deck = context['deck']
+      print(deck)
       return response
+    else:
+      return response
+
+    # valid_plays = {
+    #   "player_1": g.valid_plays(p1, deck),
+    #   "player_2": g.valid_plays(p2, deck),
+    # }
+    # print(g.table_cards)
+    # response = jsonify(list(valid_plays))
+    # print("#### valid plays ####")
+    # pprint(valid_plays)
+    # #response.headers.add('Access-Control-Allow-Origin', '*')
+    # else:
+    #   return response
 
 with app.app_context():
     print(current_app)
