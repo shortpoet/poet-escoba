@@ -18,6 +18,12 @@
       >
         Play Round
       </b-button>
+      |
+      <b-button
+        @click="unpause()"
+      >
+        Unpause
+      </b-button>
       <hr />
       <CardComp
         v-for="(card, i) in getDeck"
@@ -36,7 +42,7 @@ import axios from 'axios'
 export default {
   name: 'DeckComp',
   components: {
-    CardComp  
+    CardComp
   },
   props: {
     msg: String
@@ -60,8 +66,8 @@ export default {
       }
     },
     post: function (url, payload) {
-      var config = { 
-        headers: {  
+      var config = {
+        headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
           }
@@ -95,6 +101,12 @@ export default {
         isDeck: true
       }
       this.post("http://127.0.0.1:5000/playround", payload)
+    },
+    unpause: function () {
+      var payload = {
+        paused: false
+      }
+      this.post("http://127.0.0.1:5000/unpause", payload)
     },
   },
   mounted: function() {

@@ -124,12 +124,19 @@ class Game:
   pl1 = Player('p1')
   pl2 = Player('p2')
   table_cards = set()
+  paused = True
   def __init__(self, pl1, pl2, deck=Deck()):
     self.pl1 = pl1
     self.pl2 = pl2
     self.deck = deck
     print("Start game")
     #return NotImplemented
+
+  def set_pause_state(switch):
+    self.paused = switch
+
+  def get_pause_state():
+    return self.paused
 
   def set_card_owner(self, card, owner):
     c = self.deck.cards()[card]
@@ -141,12 +148,12 @@ class Game:
   def deal_hand(self):
     p1 = set()
     p2 = set()
-    print(len(self.deck.order()))
+    print(f"cards_remaining_before_deal: {len(self.deck.order())}")
     # deal out to p1 and p2 alternating 3 each
     for count in range(0,3):
       [ p1.add(d) for d in self.deck.deal()]
       [ p2.add(d) for d in self.deck.deal()]
-    print(len(self.deck.order())) 
+    print(f"cards_remaining_after_deal: {len(self.deck.order())}")
     return p1,p2
 
   def deal_start(self):
@@ -255,6 +262,9 @@ class Game:
         second_player.new_hand(p2_cards)
         cards_left = len(self.deck.order())
 
+      def get_play(play):
+        #print(play)
+        return play
 
       # hand per player
       while (len(first_player.hand) + len(second_player.hand) > 0):
@@ -267,12 +277,8 @@ class Game:
           playable = self.valid_plays(second_player,self.table_cards)
           play = second_player.get_play(playable)
           if self.apply_play(play,second_player): last_scored = second_player.name
-        # print(app.app_context)
-        # with app.app_context():
-        #     while not result_available.wait(timeout=120):
-        #         print('waiting for user input')
-        print(result)
-        print(play)
+        while (self.paused):
+          get_play(play)
     # award last_player_to_score remaining cards
     [self.set_card_owner(card_id, last_scored) for card_id, card in self.deck.cards().items() if card.owner == '']
     self.apply_score()
@@ -284,7 +290,7 @@ def test():
     return 'test'
 
 class LogItem(Base):
-    __tablename__ = 'log'
+    __tablename__ = 'Log'
     LogId = Column(Integer, primary_key=True)
     LogTime = Column(TIMESTAMP, default=dt.utcnow())
     LogType = Column(String(32))
@@ -299,7 +305,7 @@ class LogItem(Base):
 db = create_engine('mysql://root:password@localhost/test',echo=False)
 metadata.reflect(bind=db)
 
-log_table = metadata.tables['log']
+log_table = metadata.tables['Log']
 
 sm = orm.sessionmaker(bind=db, autoflush=True, autocommit=True, expire_on_commit=True)
 session = orm.scoped_session(sm)
@@ -332,12 +338,6 @@ def makedeck():
 
     if request.method == "POST":
         context = request.get_json(force=True)
-        id_query = session.query(LogItem.LogId).all()
-        ids = []
-        for logid in id_query:
-            ids.append(logid)
-        last_id = ids[-1][0]
-        print(int(last_id))
         if context['isDeck'] == True:
             log_item = LogItem(LogTime=dt.utcnow(), LogType='Deck', LogBlob=context)
             print(context['deck'][0])
@@ -345,8 +345,14 @@ def makedeck():
             print(dt.utcnow())
             session.add(log_item)
             print("#### checking update ####")
-            for item in session.query(LogItem).filter(LogItem.LogId==last_id):
-                print(item)
+        id_query = session.query(LogItem.LogId).all()
+        ids = []
+        for logid in id_query:
+          ids.append(logid)
+        last_id = ids[-1][0]
+        print(int(last_id))
+        for item in session.query(LogItem).filter(LogItem.LogId==last_id):
+          print(item)
 
         return response
     else:
@@ -385,7 +391,6 @@ def playround():
     if request.method == "POST":
 
         context = request.get_json(force=True)
-        
         g.play_round(p1, p2)
         round_results = f"Player 1 score: {p1.score}\n\tPlayer 2 score: {p2.score}"
         print(round_results)
@@ -394,10 +399,29 @@ def playround():
     else:
         return response
 
-# thread = threading.Thread(target=playround)
-# thread.start()
-# result_available = threading.Event()
-# result = None
+@app.route("/unpause", methods=["GET", "POST"])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def unpause():
+
+
+    items = {
+    }
+
+    response = jsonify(items)
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+
+    if request.method == "POST":
+
+        context = request.get_json(force=True)
+        if context['paused'] == True:
+          paused = True
+          print(f"paused_state: {paused}")
+          g.set_pause_state(paused)
+
+        return response
+    else:
+        return response
+
 with app.app_context():
     print(current_app)
 
